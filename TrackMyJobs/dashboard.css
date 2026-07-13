@@ -1,0 +1,176 @@
+:root{
+  --bg: #0a0a0b;
+  --bg-raised: #141311;
+  --bg-card: #131211;
+  --line: rgba(247,96,10,0.14);
+  --line-soft: rgba(255,255,255,0.07);
+  --ink: #f5f1e8;
+  --ink-dim: #9a958a;
+  --ink-faint: #5f5c54;
+  --accent: #f7600a;
+  --accent-dim: rgba(247,96,10,0.12);
+  --ok: #7a9b6e;
+  --pending: #d9a441;
+  --rejected: #a85c4d;
+  --linkedin: #4a8fd9;
+  --indeed: #7fb0e0;
+  --naukri: #d97757;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html,body{ background: var(--bg); color: var(--ink); font-family: var(--font-mono); min-height:100vh; }
+
+body{ background-image: radial-gradient(circle at 15% 0%, rgba(247,96,10,0.06), transparent 40%); }
+
+.shell{ max-width: 920px; margin: 0 auto; padding: 40px 32px 80px; }
+
+header{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 36px; }
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand-mark{
+  width: 38px; height: 38px; border-radius: 9px;
+  background: linear-gradient(155deg, var(--accent), #b8460a);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 6px 20px rgba(247,96,10,0.35);
+}
+.brand-mark svg{ width:19px; height:19px; }
+.brand-name{ font-family: var(--font-display); font-size: 30px; font-weight: 600; line-height:1; }
+.brand-sub{ font-size: 10.5px; color: var(--ink-faint); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; }
+
+/* ---------- Stats ---------- */
+.stats-row{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+.stat-card{
+  border: 1px solid var(--line-soft);
+  background: var(--bg-raised);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.stat-card .stat-num{ font-family: var(--font-display); font-size: 34px; font-weight: 600; line-height:1; color: var(--ink); }
+.stat-card.interview .stat-num{ color: var(--pending); }
+.stat-card.offer .stat-num{ color: var(--ok); }
+.stat-card.rejected .stat-num{ color: var(--rejected); }
+.stat-card .stat-label{ font-size: 9.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-faint); margin-top: 6px; }
+
+/* ---------- Controls ---------- */
+.controls{ display:flex; align-items:center; justify-content:space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+
+.search-wrap{
+  flex: 1; min-width: 220px;
+  display:flex; align-items:center; gap: 10px;
+  border: 1px solid var(--line-soft);
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.search-wrap svg{ width:15px; height:15px; stroke: var(--ink-faint); flex-shrink:0; }
+.search-wrap input{
+  border:none; outline:none; background:transparent; color: var(--ink);
+  font-family: var(--font-mono); font-size: 12.5px; width:100%;
+}
+.search-wrap input::placeholder{ color: var(--ink-faint); }
+
+.filters{ display:flex; gap: 6px; }
+.filter{
+  border: 1px solid var(--line-soft);
+  background: var(--bg-card);
+  color: var(--ink-dim);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 9px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.filter:hover{ border-color: var(--line); color: var(--ink); }
+.filter.active{ background: var(--accent); border-color: var(--accent); color: #100a06; font-weight: 500; }
+
+/* ---------- Table ---------- */
+.table-wrap{
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.table-head{
+  display:grid;
+  grid-template-columns: 1fr 110px 110px 130px 40px;
+  gap: 12px;
+  padding: 12px 20px;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.row{
+  display:grid;
+  grid-template-columns: 1fr 110px 110px 130px 40px;
+  gap: 12px;
+  align-items:center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line-soft);
+  transition: background .12s ease;
+}
+.row:last-child{ border-bottom: none; }
+.row:hover{ background: rgba(255,255,255,0.015); }
+
+.role-cell{ min-width:0; }
+.role-cell a{ color: var(--ink); text-decoration:none; font-size: 13.5px; }
+.role-cell a:hover{ color: var(--accent); }
+.role-cell .co{ font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+
+.source-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size: 10px; color: var(--ink-dim); text-transform: capitalize;
+}
+.source-pill .dot{ width:7px; height:7px; border-radius:50%; }
+.source-pill .dot.linkedin{ background: var(--linkedin); }
+.source-pill .dot.indeed{ background: var(--indeed); }
+.source-pill .dot.naukri{ background: var(--naukri); }
+.source-pill .dot.manual{ background: var(--ink-faint); }
+
+.date-cell{ font-size: 11px; color: var(--ink-faint); }
+
+.status-select{
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 7px 10px;
+  border-radius: 100px;
+  border: 1px solid var(--line-soft);
+  background: rgba(255,255,255,0.04);
+  color: var(--ink);
+  cursor: pointer;
+  width: 100%;
+}
+.status-select.applied{ color:#c9c4b8; }
+.status-select.interview{ color: var(--pending); border-color: rgba(217,164,65,0.3); }
+.status-select.offer{ color: var(--ok); border-color: rgba(122,155,110,0.3); }
+.status-select.rejected{ color: var(--rejected); border-color: rgba(168,92,77,0.3); }
+
+.delete-btn{
+  width: 28px; height: 28px; border-radius: 7px;
+  border: 1px solid var(--line-soft);
+  background: transparent;
+  display:flex; align-items:center; justify-content:center;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.delete-btn:hover{ border-color: rgba(168,92,77,0.5); background: rgba(168,92,77,0.1); }
+.delete-btn svg{ width:13px; height:13px; stroke: var(--ink-faint); }
+.delete-btn:hover svg{ stroke: var(--rejected); }
+
+.empty-state{ padding: 60px 20px; text-align:center; }
+.empty-state p{ font-family: var(--font-display); font-size: 20px; font-style: italic; margin-bottom: 6px; }
+.empty-state span{ font-size: 12px; color: var(--ink-faint); }
+
+@media (max-width: 640px){
+  .stats-row{ grid-template-columns: repeat(2, 1fr); }
+  .table-head{ display:none; }
+  .row{ grid-template-columns: 1fr; gap: 8px; }
+}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Pursuit — Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="fonts.css" />
+<link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0d0d0d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">Pursuit</div>
+          <div class="brand-sub">Every application, one place</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">Total applied</div>
+      </div>
+      <div class="stat-card interview">
+        <div class="stat-num" id="statInterview">0</div>
+        <div class="stat-label">Interview</div>
+      </div>
+      <div class="stat-card offer">
+        <div class="stat-num" id="statOffer">0</div>
+        <div class="stat-label">Offers</div>
+      </div>
+      <div class="stat-card rejected">
+        <div class="stat-num" id="statRejected">0</div>
+        <div class="stat-label">Rejected</div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input type="text" id="search" placeholder="Search role or company…" />
+      </div>
+
+      <div class="filters" id="filters">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="applied">Applied</button>
+        <button class="filter" data-filter="interview">Interview</button>
+        <button class="filter" data-filter="offer">Offer</button>
+        <button class="filter" data-filter="rejected">Rejected</button>
+      </div>
+    </section>
+
+    <section class="table-wrap">
+      <div class="table-head">
+        <span class="col-role">Role</span>
+        <span class="col-source">Source</span>
+        <span class="col-date">Applied</span>
+        <span class="col-status">Status</span>
+        <span class="col-actions"></span>
+      </div>
+      <div id="rows"></div>
+
+      <div class="empty-state" id="emptyState" hidden>
+        <p>No applications match this view.</p>
+        <span>Apply to something new, or clear your filters.</span>
+      </div>
+    </section>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

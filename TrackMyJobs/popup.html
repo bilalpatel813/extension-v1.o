@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Pursuit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="fonts.css" />
+<link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0d0d0d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4"></path>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Pursuit</div>
+        <div class="brand-sub">Application Tracker</div>
+      </div>
+    </div>
+    <div class="icon-btn" id="openDashboardIcon" title="Open dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+        <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
+        <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
+        <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+      </svg>
+    </div>
+  </header>
+
+  <!-- Auto-detected job capture: populated by popup.js -->
+  <div class="capture" id="captureCard">
+    <div class="capture-status"><span class="dot"></span> <span id="captureStatusText">scanning this page…</span></div>
+    <div class="job-title" id="captureTitle">No job detected here</div>
+    <div class="job-company" id="captureCompany">Open a job listing on LinkedIn, Indeed, or Naukri</div>
+    <button class="capture-btn" id="saveBtn" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12h14"></path>
+      </svg>
+      <span id="saveBtnLabel">Save this application</span>
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat applied">
+      <div class="stat-num" id="statApplied">0</div>
+      <div class="stat-label">Applied</div>
+    </div>
+    <div class="stat interview">
+      <div class="stat-num" id="statInterview">0</div>
+      <div class="stat-label">Interview</div>
+    </div>
+    <div class="stat offers">
+      <div class="stat-num" id="statOffers">0</div>
+      <div class="stat-label">Offers</div>
+    </div>
+  </div>
+
+  <!-- Recent applications -->
+  <div class="section-label">
+    <span>Recent</span>
+    <a href="#" id="viewAll">View all →</a>
+  </div>
+
+  <div class="app-list" id="appList">
+    <!-- rows injected by popup.js -->
+  </div>
+  <div class="empty-state" id="emptyState" hidden>
+    <p>Nothing tracked yet.</p>
+    <span>Apply to a role on LinkedIn, Indeed, or Naukri and it'll show up here automatically.</span>
+  </div>
+
+  <!-- Footer / full dashboard -->
+  <footer>
+    <a href="#" class="dashboard-link" id="openDashboard">
+      <div class="txt">
+        <span class="t1">Open full dashboard</span>
+        <span class="t2">Boards, timelines &amp; notes</span>
+      </div>
+      <div class="arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6"></path>
+        </svg>
+      </div>
+    </a>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

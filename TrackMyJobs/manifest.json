@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "Pursuit — Job Application Tracker",
+  "short_name": "Pursuit",
+  "version": "1.0.0",
+  "description": "Automatically tracks job applications you submit on LinkedIn, Indeed, and Naukri, in one dashboard.",
+  "permissions": ["storage", "activeTab", "notifications"],
+  "host_permissions": [
+    "*://*.linkedin.com/*",
+    "*://*.indeed.com/*",
+    "*://*.naukri.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Pursuit — Job Tracker",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.linkedin.com/jobs/*"],
+      "js": ["content-scripts/common.js", "content-scripts/linkedin.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://*.indeed.com/*"],
+      "js": ["content-scripts/common.js", "content-scripts/indeed.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://*.naukri.com/*"],
+      "js": ["content-scripts/common.js", "content-scripts/naukri.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

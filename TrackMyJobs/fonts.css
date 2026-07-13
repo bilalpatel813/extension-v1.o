@@ -1,0 +1,32 @@
+/**
+ * fonts.css
+ *
+ * Extension pages run under a strict default CSP that blocks remote
+ * stylesheets/fonts (e.g. fonts.googleapis.com), so this file intentionally
+ * makes NO network requests. It falls back to close system equivalents.
+ *
+ * To use the real Cormorant Garamond / DM Mono faces:
+ *   1. Download the .woff2 files from Google Fonts.
+ *   2. Put them in a /fonts folder in this extension.
+ *   3. Uncomment the @font-face blocks below and point src at your files.
+ */
+
+/*
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond.woff2') format('woff2');
+  font-weight: 400 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'DM Mono';
+  src: url('fonts/dm-mono.woff2') format('woff2');
+  font-weight: 400 500;
+  font-style: normal;
+}
+*/
+
+:root {
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SF Mono', 'Consolas', 'Menlo', monospace;
+}
