@@ -55,6 +55,26 @@ async function addApplication(payload) {
 
   applications.unshift(entry);
   await setApplications(applications);
+  
+  async function saveToBackend(){
+    const response = await 
+    fetch(
+    "http://127.0.0.1:8000/api/applications/",
+    {
+      method:"POST",
+      headers:{
+        "Content_Type":"application/json",
+        //"Authorization":`Bearer ${token}`
+      },
+      body:JSON.stringify(entry)
+    });
+    return await response.json();
+  }
+  try{
+    await saveToBackend(entry);
+  }catch(err){
+    console.error("Backend error : "err);
+  }
 
   chrome.notifications?.create?.({
     type: "basic",
