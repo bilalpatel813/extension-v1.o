@@ -73,7 +73,7 @@ async function addApplication(payload) {
   try{
     await saveToBackend(entry);
   }catch(err){
-    console.error("Backend error : "err);
+    console.error("Backend error : ",err);
   }
 
   chrome.notifications?.create?.({
