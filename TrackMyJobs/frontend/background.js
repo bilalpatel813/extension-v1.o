@@ -28,7 +28,23 @@ function updateBadge(applications) {
   chrome.action.setBadgeText({ text: count ? String(count) : "" });
   chrome.action.setBadgeBackgroundColor({ color: "#f7600a" });
 }
-
+async function saveToBackend(entry){
+    const response = await 
+    fetch(
+    "http://127.0.0.1:8000/api/applications/",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        //"Authorization":`Bearer ${token}`
+      },
+      body:JSON.stringify(entry)
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return await response.json();
+}
 async function addApplication(payload) {
   const applications = await getApplications();
 
@@ -56,20 +72,6 @@ async function addApplication(payload) {
   applications.unshift(entry);
   await setApplications(applications);
   
-  async function saveToBackend(){
-    const response = await 
-    fetch(
-    "http://127.0.0.1:8000/api/applications/",
-    {
-      method:"POST",
-      headers:{
-        "Content_Type":"application/json",
-        //"Authorization":`Bearer ${token}`
-      },
-      body:JSON.stringify(entry)
-    });
-    return await response.json();
-  }
   try{
     await saveToBackend(entry);
   }catch(err){
