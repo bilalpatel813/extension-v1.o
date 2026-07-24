@@ -67,6 +67,22 @@ Status colors: `applied` (neutral), `interview` (`#d9a441`), `offer`
 (`#7a9b6e`), `rejected` (`#a85c4d`). Source colors: LinkedIn (`#4a8fd9`),
 Indeed (`#7fb0e0`), Naukri (`#d97757`).
 
+## Updating the extension download
+
+The landing page's "Get the extension" button serves a static file — it
+isn't generated at build time. To ship a newer version of the extension:
+
+1. Zip your updated extension folder (`manifest.json` at the root of the
+   zip, not nested inside another folder).
+2. Overwrite `public/downloads/pursuit-extension.zip` with the new zip
+   (keep the same filename).
+3. Optionally bump `EXTENSION_VERSION` in
+   `src/app/(marketing)/page.tsx` so the version label on the button
+   updates too.
+
+No other code changes needed. See the comment directly above
+`EXTENSION_DOWNLOAD_PATH` in that file for the same instructions in context.
+
 ## Deploying
 
 Any Next.js host works (Vercel is the path of least resistance). Once the

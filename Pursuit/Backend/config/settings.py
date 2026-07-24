@@ -43,6 +43,7 @@ CORS_ALLOWED_ALL_ORIGINS = True
 INSTALLED_APPS = [
     'apps.Tracker.apps.TrackerConfig',
     'apps.Analytics.apps.AnalyticsConfig',
+    'apps.users.apps.UsersConfig',
     'rest_framework',
     "corsheaders",
     'django.contrib.admin',

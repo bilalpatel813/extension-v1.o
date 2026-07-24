@@ -108,3 +108,9 @@ dist/
 scripts/output/
 *.pid
 *.sock
+
+# ==============================
+#  BACKUPS
+# ==============================
+extension-v1.zip
+pursuit-website-v1.zip

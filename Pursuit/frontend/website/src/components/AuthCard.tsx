@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 import { BrandMark } from "./BrandMark";
+import { AnimatedBackground } from "./AnimatedBackground";
 
 export function AuthCard({
   title,
@@ -14,15 +15,16 @@ export function AuthCard({
   footer: ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col ambient-glow">
-      <div className="p-6">
+    <div className="relative min-h-screen flex flex-col ambient-glow overflow-hidden">
+      <AnimatedBackground fixed />
+      <div className="relative z-10 p-6">
         <Link href="/" className="inline-flex items-center gap-2.5">
           <BrandMark size={28} />
           <span className="font-display text-xl font-semibold">Pursuit</span>
         </Link>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-6 pb-16">
+      <div className="relative z-10 flex-1 flex items-center justify-center px-6 pb-16">
         <div className="w-full max-w-[400px]">
           <div className="mb-8 text-center">
             <h1 className="font-display text-[30px] font-semibold mb-2">{title}</h1>

@@ -2,13 +2,32 @@ import Link from "next/link";
 import { HeroMock } from "@/components/HeroMock";
 import { Reveal } from "@/components/Reveal";
 import { FeatureCard } from "@/components/FeatureCard";
-import { AnimatedBackground } from "@/components/AnimatedBackground";
 
 const sources = [
   { name: "LinkedIn", dot: "bg-linkedin" },
   { name: "Indeed", dot: "bg-indeed" },
   { name: "Naukri", dot: "bg-naukri" },
 ];
+
+/**
+ * UPDATING THE EXTENSION DOWNLOAD
+ * --------------------------------
+ * The "Get the extension" button below serves a static file from
+ * /public/downloads/pursuit-extension.zip — it is NOT generated at build
+ * time, so there's nothing to run when you have a new version.
+ *
+ * To ship a newer build of the extension:
+ *   1. Zip your updated extension folder (same layout as before —
+ *      manifest.json at the root of the zip, not nested one level deeper).
+ *   2. Replace the file at:
+ *        pursuit-website/public/downloads/pursuit-extension.zip
+ *      (same filename — just overwrite it).
+ *   3. Optionally bump EXTENSION_VERSION below so the label on the button
+ *      reflects the new version number.
+ * That's it — no code change needed unless the filename itself changes.
+ */
+const EXTENSION_DOWNLOAD_PATH = "/downloads/pursuit-extension.zip";
+const EXTENSION_VERSION = "1.0.0";
 
 const features = [
   {
@@ -126,7 +145,6 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative ambient-glow overflow-hidden">
-        <AnimatedBackground />
         <div className="relative z-10 mx-auto max-w-6xl px-6 pt-20 pb-24 grid lg:grid-cols-2 gap-16 items-center">
           <div>
             <Reveal>
@@ -224,6 +242,29 @@ export default function LandingPage() {
             </Reveal>
           ))}
         </div>
+
+        <Reveal delay={0.3}>
+          <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 rounded-2xl border border-line bg-bg-card px-7 py-6">
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="font-display text-[18px] font-semibold mb-1">Ready when you are</h3>
+              <p className="text-[12.5px] text-ink-dim">
+                Download the extension package and load it as described above.
+              </p>
+            </div>
+            <a
+              href={EXTENSION_DOWNLOAD_PATH}
+              download
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-[#100a06] text-[13px] font-medium hover:bg-accent-hover transition-colors flex-shrink-0"
+            >
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <path d="M7 10l5 5 5-5M12 15V3" />
+              </svg>
+              Get the extension
+              <span className="text-[10px] opacity-70">v{EXTENSION_VERSION}</span>
+            </a>
+          </div>
+        </Reveal>
       </section>
 
       {/* CTA banner */}

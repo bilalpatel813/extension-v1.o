@@ -2,8 +2,17 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
-export function AnimatedBackground() {
+export function AnimatedBackground({
+  variant = "default",
+  fixed = false,
+}: {
+  /** "subtle" halves the opacity — used behind data-dense pages like the dashboard. */
+  variant?: "default" | "subtle";
+  /** Fixed = stays put behind scrolling content, spans the whole viewport. */
+  fixed?: boolean;
+}) {
   const reduceMotion = useReducedMotion();
+  const opacityScale = variant === "subtle" ? 0.55 : 1;
 
   const blobs = [
     { size: 460, top: "-12%", left: "58%", duration: 26, opacity: 0.14 },
@@ -12,7 +21,10 @@ export function AnimatedBackground() {
   ];
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+    <div
+      className={`${fixed ? "fixed" : "absolute"} inset-0 overflow-hidden pointer-events-none`}
+      aria-hidden
+    >
       {blobs.map((b, i) => (
         <motion.div
           key={i}
@@ -22,7 +34,7 @@ export function AnimatedBackground() {
             height: b.size,
             top: b.top,
             left: b.left,
-            opacity: b.opacity,
+            opacity: b.opacity * opacityScale,
           }}
           animate={
             reduceMotion
