@@ -80,6 +80,8 @@ SIMPLE_JWT={
         timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+SITE_ID=1
+REST_USE_JWT = True
 
 ROOT_URLCONF = 'config.urls'
 
@@ -143,6 +145,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = "users.User"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
