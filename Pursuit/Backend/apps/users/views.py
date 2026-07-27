@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
-from .serializers import RegisterSerializer , LoginSerializer , UserSerializer
+from .serializers import RegisterSerializer , LoginSerializer , UserSerializer , ChangePassSerializer
 from .models import User
 # Create your views here.
 #users views 
@@ -79,4 +79,22 @@ class ProfileAPI(ModelViewSet):
          return User.objects.filter( email =self.request.user)
      def perform_create(self,serializer):
             serializer.save(user=self.request.user)
+           
+class ChangePassAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        serializer = ChangePassSerializer(
+        data =request.data,
+        context={"request":request}
+        )
+        if serializer.is_valid():
+            user = request.user
+            user.set_password(serializer.validated_data["new_pass"])
+            user.save()
+            return Response({"message":"password changed successfully"},status = status.HTTP_200_OK)
+        return Response(serializer.error,status=status.HTTP_400_BAD_REQUEST) 
+        
+        
+        
+        
     

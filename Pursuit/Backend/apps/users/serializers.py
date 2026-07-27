@@ -31,6 +31,26 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['full_name','email']
+        
+ 
+class ChangePassSerializer(serializers.Serializer):
+    current_pass = serializers.CharField(write_only =True)
+    new_pass = serializers.CharField(write_only =True)
+    re_enter_pass = serializers.CharField(write_only =True)
+    def validate(self,data):
+        user  = self.context['request'].user
+        
+        if not  user.check_password(data["current_pass"]):
+            raise serializers.ValidationError({"current_pass": "Current password is incorrect."})
+        if data['new_pass'] != data['re_enter_pass']:
+               raise serializers.ValidationError({
+                   "re_enter_pass": "Passwords do not match."
+                   
+                   }) 
+        
+        return data
+        
+        
                  
         
             
