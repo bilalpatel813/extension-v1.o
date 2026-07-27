@@ -11,7 +11,7 @@ class SignUpAPI(generics.CreateAPIView):
     queryset = User.objects.all() 
     serializer_class = RegisterSerializer
     permission_classes= [permissions.AllowAny]
-    def create(self,request,*args,**kwargs):
+    def create_user(self,request,*args,**kwargs):
         response = super().create(request,*args,**kwargs)
         user = User.objects.get(email=response.data['email'])
         print("refreash token generated! :")
