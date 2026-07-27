@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
-from .serializers import RegisterSerializer , LoginSerializer
+from .serializers import RegisterSerializer , LoginSerializer , UserSerializer
 from .models import User
 # Create your views here.
 #users views 
@@ -42,8 +45,38 @@ class LoginAPI(APIView):
            status = status.HTTP_400_BAD_REQUEST
             )   
             
-             
-       
+ 
+class LogOutAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            token = RefreshToken(request.data["refresh"])
+            token.blacklist()
+            return Response(
+                {"message": "Logged out successfully"},
+                status=status.HTTP_205_RESET_CONTENT,
+            )
+        except TokenError:
+            return Response(
+                {"message": "Token is invalid or already blacklisted"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )   
     
-       
+    
+class Me(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+        
+class ProfileAPI(ModelViewSet):
+   
+     serializer_class = UserSerializer
+     permission_classes= [IsAuthenticated]
+     def get_queryset(self):
+         return User.objects.filter( email =self.request.user)
+     def perform_create(self,serializer):
+            serializer.save(user=self.request.user)
     

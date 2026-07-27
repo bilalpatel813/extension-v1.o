@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.users.apps.UsersConfig',
     'rest_framework',
     "corsheaders",
+    "rest_framework_simplejwt.token_blacklist",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,6 +80,8 @@ SIMPLE_JWT={
     'ACCESS_TOKEN_LIFETIME':
         timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 SITE_ID=1
 REST_USE_JWT = True
