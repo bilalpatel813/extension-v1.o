@@ -83,10 +83,7 @@ export async function registerUser(input: {
      password: input.password,
     })
  });
-  console.log("input",input)
-  console.log(full_name: input.fullName,
-     email: input.email,
-     password: input.password,)
+ 
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.detail || "Registration failed");
