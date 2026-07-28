@@ -14,7 +14,7 @@
  * request/response contract these functions are written against.
  * ------------------------------------------------------------------
  */
-
+const API_URL = "https://pursuit-dp8h.onrender.com/api";
 export type JobStatus = "applied" | "interview" | "offer" | "rejected";
 export type JobSource = "linkedin" | "indeed" | "naukri" | "manual";
 
@@ -72,23 +72,29 @@ export async function registerUser(input: {
   email: string;
   password: string;
 }): Promise<User> {
-  await wait();
-  const users = readUsers();
-  if (users.some((u) => u.email.toLowerCase() === input.email.toLowerCase())) {
-    throw new Error("An account with this email already exists.");
+    const res = await fetch(`${API_URL}/auth/register/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+     full_name: input.fullName,
+     email: input.email,
+     password: input.password,
+    })
+ });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.detail || "Registration failed");
   }
-  const user: User & { password: string } = {
-    id: crypto.randomUUID(),
-    fullName: input.fullName,
-    email: input.email,
-    password: input.password, // NEVER do this for real — Django hashes server-side
-  };
-  users.push(user);
-  writeUsers(users);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password: _unusedPassword, ...safeUser } = user;
-  localStorage.setItem("pursuit_session", JSON.stringify(safeUser));
-  return safeUser;
+
+  const data = await res.json();
+
+  localStorage.setItem("access", data.access);
+  localStorage.setItem("refresh", data.refresh);
+
+  return data.user;
 }
 
 /**
