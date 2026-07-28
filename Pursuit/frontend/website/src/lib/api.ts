@@ -83,7 +83,7 @@ export async function registerUser(input: {
      password: input.password,
     })
  });
-
+  console.log(res)
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.detail || "Registration failed");
