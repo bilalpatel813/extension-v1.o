@@ -29,15 +29,28 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
+ALLOWED_HOSTS = ["*"]
 
-ALLOWED_HOSTS = []
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+SECURE_SSL_REDIRECT = not DEBUG
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 #CORS_ALLOWED_ORIGINS = [
     #"chrome-extension://EXTENSION_ID",
 #]
 
 CORS_ALLOWED_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://pursuit-sandy-three.vercel.app",
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -57,6 +70,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
 "corsheaders.middleware.CorsMiddleware",
+"whitenoise.middleware.WhiteNoiseMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -154,7 +168,7 @@ AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 # Neon Database 
-load_dotenv(".env.local")
+load_dotenv(BASE_DIR/".env.local")
 DATABASES = {
     "default": dj_database_url.parse(
         os.getenv("DATABASE_URL"),
@@ -180,7 +194,8 @@ DATABASES = {
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 #STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
