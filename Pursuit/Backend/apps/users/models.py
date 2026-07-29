@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 from django.contrib.auth.models import AbstractUser
 from .managers import UserManager
 # Create your models here.
@@ -7,7 +8,8 @@ class User(AbstractUser,UserManager):
     username = None
     first_name = None
     last_name = None
-
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     full_name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
     

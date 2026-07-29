@@ -150,7 +150,7 @@ export async function getCurrentUser():
           const token = localStorage.getItem("access");
           if (!token) return null;
           const res = await fetch(`${API_URL}/auth/me/`, {
-              method:GET,
+              method:"GET",
               headers: {
                 Authorization: `Bearer ${token}`,
   },
