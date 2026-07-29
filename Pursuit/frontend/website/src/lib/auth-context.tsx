@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateProfile: AuthContextValue["updateProfile"] = async (updates) => {
     if (!user) return;
-    const u = await api.updateProfile(user.id, updates);
+    const u = await api.updateProfile(updates);
     setUser(u);
   };
 
