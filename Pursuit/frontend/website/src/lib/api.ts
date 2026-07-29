@@ -180,7 +180,7 @@ export async function updateProfile(
 export async function changePassword(input:{
     currentPassword:string;
     newPassword:string;
-    confirmPassword:string;
+    confirmNewPassword:string;
 }):Promise<void>{
 
     const token = localStorage.getItem("access");
@@ -194,7 +194,7 @@ export async function changePassword(input:{
         body:JSON.stringify({
             current_pass:input.currentPassword,
             new_pass:input.newPassword,
-            re_enter_pass:input.confirmPassword,
+            re_enter_pass:input.confirmNewPassword,
         }),
     });
 
