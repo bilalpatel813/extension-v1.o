@@ -71,13 +71,13 @@ export default function DashboardPage() {
   async function handleStatusChange(id: string, status: JobStatus) {
     if (!user) return;
     setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
-    await api.updateApplicationStatus(user.id, id, status);
+    await api.updateApplicationStatus(id, status);
   }
 
   async function handleDelete(id: string) {
     if (!user) return;
     setApps((prev) => prev.filter((a) => a.id !== id));
-    await api.deleteApplication(user.id, id);
+    await api.deleteApplication(id);
   }
 
   return (
