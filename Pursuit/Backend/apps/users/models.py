@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from .managers import UserManager
 # Create your models here.
 #users model 
-class User(AbstractUser,UserManager):
+class User(AbstractUser):
     username = None
     first_name = None
     last_name = None
