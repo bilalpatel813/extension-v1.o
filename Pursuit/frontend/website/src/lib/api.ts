@@ -93,6 +93,7 @@ export async function registerUser(input: {
 
   localStorage.setItem("access", data.access);
   localStorage.setItem("refresh", data.refresh);
+  localStorage.setItem("pursuit_session", JSON.stringify(data.user));
 
   return data.user;
 }
@@ -118,6 +119,8 @@ export async function loginUser(input: {
       const data = await res.json();
       localStorage.setItem("access",data.access);
       localStorage.setItem("access",data.access);
+      localStorage.setItem("pursuit_session", JSON.stringify(data.user));
+      
       return data.user;
 }
   
