@@ -125,23 +125,21 @@ export async function loginUser(input: {
 }
   
 /** Django target: POST /api/auth/logout/ (blacklists refresh token) */
-export async function logoutUser():
-      const refresh = localStorage.getItem("refresh");
-      Promise<void> {
-          await fetch(`${API_URL}/auth/logout/`, {
+export async function logoutUser(): Promise<void> {
+  const refresh = localStorage.getItem("refresh");
+
+  await fetch(`${API_URL}/auth/logout/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("access")}`,
     },
-    body: JSON.stringify({
-      refresh,
-    }),
+    body: JSON.stringify({ refresh }),
   });
 
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
-    localStorage.removeItem("pursuit_session");
+  localStorage.removeItem("pursuit_session");
 }
 
 
