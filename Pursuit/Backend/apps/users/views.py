@@ -34,7 +34,9 @@ class LoginAPI(APIView):
         if serializer.is_valid():
             user = serializer.validated_data["user"]
             refresh = RefreshToken.for_user(user)
+            user_data = User.Serializer(user).data
             return Response({
+              "user":user_data,
               "refresh": str(refresh),
               "access": str(refresh.access_token),
               "message":"Login Successfully"

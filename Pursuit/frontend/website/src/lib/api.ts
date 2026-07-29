@@ -117,7 +117,7 @@ export async function loginUser(input: {
            throw new Error("Invalid credential");
        }
       const data = await res.json();
-      localStorage.setItem("access",data.access);
+      localStorage.setItem("refresh",data.access);
       localStorage.setItem("access",data.access);
       localStorage.setItem("pursuit_session", JSON.stringify(data.user));
       
@@ -125,16 +125,44 @@ export async function loginUser(input: {
 }
   
 /** Django target: POST /api/auth/logout/ (blacklists refresh token) */
-export async function logoutUser(): Promise<void> {
-  await wait(120);
-  localStorage.removeItem("pursuit_session");
+export async function logoutUser():
+      const refresh = localStorage.getItem("refresh");
+      Promise<void> {
+          await fetch(`${API_URL}/auth/logout/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access")}`,
+    },
+    body: JSON.stringify({
+      refresh,
+    }),
+  });
+
+  localStorage.removeItem("access");
+  localStorage.removeItem("refresh");
+    localStorage.removeItem("pursuit_session");
 }
 
+
+
 /** Django target: GET /api/auth/me/ */
-export async function getCurrentUser(): Promise<User | null> {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem("pursuit_session");
-  return raw ? JSON.parse(raw) : null;
+export async function getCurrentUser():      
+      Promise<User | null> {
+          const token = localStorage.getItem("access");
+          if (!token) return null;
+          const res = await fetch(`${API_URL}/auth/me/`, {
+              method:GET,
+              headers: {
+                Authorization: `Bearer ${token}`,
+  },
+  
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+
+  return  data;
+
 }
 
 /** Django target: PATCH /api/profile/ */
