@@ -41,7 +41,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user) return;
-    api.getApplications(user.id).then((data) => {
+    api.getApplications().then((data) => {
       setApps(data);
       setLoading(false);
     });
