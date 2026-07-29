@@ -2,13 +2,9 @@
  * api.ts
  * ------------------------------------------------------------------
  * Single point of contact between the frontend and the backend.
- *
- * Right now every function here is a MOCK — it reads/writes
- * localStorage so the UI is fully clickable before the Django backend
- * exists. When the backend is ready, replace the body of each
- * function with a real `fetch()` call to the endpoint noted in its
- * comment. Nothing outside this file should need to change — every
- * component calls these functions, never localStorage directly.
+ * Every function here does a real fetch() against the Django backend.
+ * Nothing outside this file should need to change — every component
+ * calls these functions, never localStorage directly.
  *
  * See BACKEND_INTEGRATION.md at the project root for the full
  * request/response contract these functions are written against.
@@ -36,7 +32,43 @@ export interface User {
   email: string;
 }
 
+/**
+ * Pulls a human-readable message out of a DRF error response body, which
+ * can come back in a few different shapes depending on how the view
+ * raised it: {non_field_errors: [...]}, {detail: "..."}, or a plain
+ * {field: ["..."]} validation-error dict. Explicitly typed as `unknown`
+ * in and narrowed by hand, so this never trips the "implicitly any"
+ * indexing error that the inline chain did.
+ */
+function extractErrorMessage(error: unknown, fallback = "Request failed"): string {
+  if (error && typeof error === "object") {
+    const err = error as Record<string, unknown>;
 
+    const nonFieldErrors = err.non_field_errors;
+    if (Array.isArray(nonFieldErrors) && typeof nonFieldErrors[0] === "string") {
+      return nonFieldErrors[0];
+    }
+
+    if (typeof err.detail === "string") {
+      return err.detail;
+    }
+
+    if (typeof err.message === "string") {
+      return err.message;
+    }
+
+    const firstValue = Object.values(err)[0];
+    if (Array.isArray(firstValue) && typeof firstValue[0] === "string") {
+      return firstValue[0];
+    }
+  }
+  return fallback;
+}
+
+async function parseErrorResponse(res: Response, fallback?: string): Promise<string> {
+  const error: unknown = await res.json().catch(() => ({}));
+  return extractErrorMessage(error, fallback);
+}
 
 /* ------------------------------------------------------------------
  * AUTH
@@ -47,17 +79,16 @@ export async function registerUser(input: {
   email: string;
   password: string;
 }): Promise<User> {
-    const res = await fetch(`${API_URL}/auth/register/`, {
+  const res = await fetch(`${API_URL}/auth/register/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(input)
- });
- 
+    body: JSON.stringify(input),
+  });
+
   if (!res.ok) {
-    const error: any = await res.json().catch(() => ({}));
-    throw new Error(error.non_field_errors?.[0] || error.detail || Object.values(error)[0]?.[0] || "Request failed");
+    throw new Error(await parseErrorResponse(res, "Registration failed"));
   }
 
   const data = await res.json();
@@ -70,33 +101,32 @@ export async function registerUser(input: {
 }
 
 /**
- * Django target: POST /api/auth/login/  ->  { access, refresh }
- * followed by  GET /api/auth/me/  ->  { user }
+ * Django target: POST /api/auth/login/  ->  { user, access, refresh }
  */
 export async function loginUser(input: {
   email: string;
   password: string;
 }): Promise<User> {
-    const res = await fetch(`${API_URL}/auth/login/`,{
-        method :"POST",
-        headers:{
-            "Content-Type":"application/json",
-        },
-        body:JSON.stringify(input)        
-       });
-       if (!res.ok) {
-            const error: any = await res.json().catch(() => ({}));
-throw new Error(error.non_field_errors?.[0] || error.detail || Object.values(error)[0]?.[0] || "Request failed");
+  const res = await fetch(`${API_URL}/auth/login/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
 
+  if (!res.ok) {
+    throw new Error(await parseErrorResponse(res, "Invalid credentials"));
+  }
+
+  const data = await res.json();
+  localStorage.setItem("access", data.access);
+  localStorage.setItem("refresh", data.refresh);
+  localStorage.setItem("pursuit_session", JSON.stringify(data.user));
+
+  return data.user;
 }
-const data = await res.json();
-      localStorage.setItem("refresh",data.refresh);
-      localStorage.setItem("access",data.access);
-      localStorage.setItem("pursuit_session", JSON.stringify(data.user));
-      
-      return data.user;
-}
-  
+
 /** Django target: POST /api/auth/logout/ (blacklists refresh token) */
 export async function logoutUser(): Promise<void> {
   const refresh = localStorage.getItem("refresh");
@@ -118,25 +148,20 @@ export async function logoutUser(): Promise<void> {
   }
 }
 
-
-
 /** Django target: GET /api/auth/me/ */
-export async function getCurrentUser():      
-      Promise<User | null> {
-          const token = localStorage.getItem("access");
-          if (!token) return null;
-          const res = await fetch(`${API_URL}/auth/me/`, {
-              method:"GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-  },
-  
+export async function getCurrentUser(): Promise<User | null> {
+  const token = localStorage.getItem("access");
+  if (!token) return null;
+
+  const res = await fetch(`${API_URL}/auth/me/`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
+
   if (!res.ok) return null;
-  const data = await res.json();
-
-  return  data;
-
+  return await res.json();
 }
 
 /** Django target: PATCH /api/profile/ */
@@ -149,40 +174,40 @@ export async function updateProfile(
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify(updates),
   });
-  if (!res.ok) throw new Error("Failed to update profile");
+
+  if (!res.ok) {
+    throw new Error(await parseErrorResponse(res, "Failed to update profile"));
+  }
+
   const data = await res.json();
   localStorage.setItem("pursuit_session", JSON.stringify(data));
   return data;
 }
 
 /** Django target: POST /api/auth/change-password/ */
-export async function changePassword(input:{
-    currentPassword:string;
-    newPassword:string;
-    confirmNewPassword:string;
-}):Promise<void>{
+export async function changePassword(input: {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}): Promise<void> {
+  const token = localStorage.getItem("access");
 
-    const token = localStorage.getItem("access");
+  const res = await fetch(`${API_URL}/auth/change-password/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      current_pass: input.currentPassword,
+      new_pass: input.newPassword,
+      re_enter_pass: input.confirmNewPassword,
+    }),
+  });
 
-    const res = await fetch(`${API_URL}/auth/change-password/`,{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json",
-            Authorization:`Bearer ${token}`,
-        },
-        body:JSON.stringify({
-            current_pass:input.currentPassword,
-            new_pass:input.newPassword,
-            re_enter_pass:input.confirmNewPassword,
-        }),
-    });
-
-    if(!res.ok){
-    const error=await res.json();  
-    throw new Error(error.detail || "Password change failed");
-    
-    }
- 
+  if (!res.ok) {
+    throw new Error(await parseErrorResponse(res, "Password change failed"));
+  }
 }
 
 /* ------------------------------------------------------------------
