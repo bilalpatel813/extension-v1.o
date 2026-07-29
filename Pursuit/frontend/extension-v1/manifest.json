@@ -8,7 +8,8 @@
   "host_permissions": [
     "*://*.linkedin.com/*",
     "*://*.indeed.com/*",
-    "*://*.naukri.com/*"
+    "*://*.naukri.com/*",
+    "https://pursuit-dp8h.onrender.com/*"
   ],
   "background": {
     "service_worker": "background.js"

@@ -32,6 +32,34 @@
     </div>
   </header>
 
+  <!-- Login gate: shown when no access token is stored. -->
+  <div class="login-screen" id="loginScreen" hidden>
+    <div class="login-title">Sign in to Pursuit</div>
+    <div class="login-sub">Sync your tracked applications to your account.</div>
+    <form id="loginForm">
+      <label class="login-field">
+        <span>Email</span>
+        <input type="email" id="loginEmail" autocomplete="username" required />
+      </label>
+      <label class="login-field">
+        <span>Password</span>
+        <input type="password" id="loginPassword" autocomplete="current-password" required />
+      </label>
+      <div class="login-error" id="loginError" hidden></div>
+      <button type="submit" class="capture-btn" id="loginBtn">
+        <span id="loginBtnLabel">Sign in</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Main app content: hidden until we know the user is logged in. -->
+  <div id="appContent" hidden>
+
+  <div class="account-row" id="accountRow" hidden>
+    <span id="accountEmail"></span>
+    <a href="#" id="logoutLink">Sign out</a>
+  </div>
+
   <!-- Auto-detected job capture: populated by popup.js -->
   <div class="capture" id="captureCard">
     <div class="capture-status"><span class="dot"></span> <span id="captureStatusText">scanning this page…</span></div>
@@ -89,6 +117,9 @@
       </div>
     </a>
   </footer>
+
+  </div>
+  <!-- /#appContent -->
 
   <script src="popup.js"></script>
 </body>

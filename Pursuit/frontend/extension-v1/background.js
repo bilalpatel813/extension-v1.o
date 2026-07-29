@@ -44,21 +44,135 @@ async function getAccessToken() {
   return access || null;
 }
 
+async function getRefreshToken() {
+  const { refresh } = await chrome.storage.local.get("refresh");
+  return refresh || null;
+}
+
+async function getAuthState() {
+  const { access, email, fullName } = await chrome.storage.local.get(["access", "email", "fullName"]);
+  return { loggedIn: !!access, email: email || null, fullName: fullName || null };
+}
+
+async function storeTokens({ access, refresh, email, fullName }) {
+  const toStore = {};
+  if (access !== undefined) toStore.access = access;
+  if (refresh !== undefined) toStore.refresh = refresh;
+  if (email !== undefined) toStore.email = email;
+  if (fullName !== undefined) toStore.fullName = fullName;
+  await chrome.storage.local.set(toStore);
+}
+
+async function clearTokens() {
+  await chrome.storage.local.remove(["access", "refresh", "email", "fullName"]);
+}
+
 /**
- * POSTs an entry to the backend. Throws on any failure (missing token,
- * network error, non-2xx response) so callers can decide how to handle it.
- * Returns the parsed JSON body on success.
+ * Logs in against POST /api/login/, which expects {email, password} and
+ * returns {user: {id, fullName, email}, access, refresh, message}. Stores
+ * both tokens plus the user's name/email on success. Throws with a
+ * readable message on failure so the popup can show it.
  */
-async function saveToBackend(entry) {
+async function login(email, password) {
+  const response = await fetch(`${API_BASE}/auth/login/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    // LoginSerializer raises a plain "Invalid Credential" validation error
+    // (as a non_field_errors-style array) on bad credentials.
+    const message =
+      data.non_field_errors?.[0] || data.detail || data.message || `Login failed (HTTP ${response.status})`;
+    throw new Error(message);
+  }
+
+  await storeTokens({
+    access: data.access,
+    refresh: data.refresh,
+    email: data.user?.email ?? email,
+    fullName: data.user?.fullName ?? null,
+  });
+  return { email: data.user?.email ?? email, fullName: data.user?.fullName ?? null };
+}
+
+/**
+ * Calls POST /api/logout/ to blacklist the refresh token server-side, then
+ * clears local storage regardless of whether that call succeeds — the user
+ * should end up logged out locally either way.
+ */
+async function logout() {
+  const access = await getAccessToken();
+  const refresh = await getRefreshToken();
+
+  if (access && refresh) {
+    try {
+      await fetch(`${API_BASE}/auth/logout/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access}`,
+        },
+        body: JSON.stringify({ refresh }),
+      });
+    } catch (err) {
+      console.error("Logout request failed, clearing local session anyway", err);
+    }
+  }
+
+  await clearTokens();
+}
+
+/**
+ * Uses the stored refresh token to get a new access token via SimpleJWT's
+ * default /api/token/refresh/ endpoint. Returns the new access token, or
+ * null if there's no refresh token or it's been rejected (in which case
+ * stored tokens are cleared and the user needs to log in again).
+ *
+ * NOTE: this assumes rest_framework_simplejwt's TokenRefreshView is wired
+ * up at this path alongside your custom /api/login/ and /api/logout/. If
+ * it isn't, add it to urls.py or point this at whatever refresh route you
+ * do have.
+ */
+async function refreshAccessToken() {
+  const refresh = await getRefreshToken();
+  if (!refresh) return null;
+
+  const response = await fetch(`${API_BASE}/auth/token/refresh/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh }),
+  });
+
+  if (!response.ok) {
+    await clearTokens();
+    return null;
+  }
+
+  const data = await response.json();
+  await storeTokens({ access: data.access });
+  return data.access;
+}
+
+/**
+ * POSTs an entry to the backend. Throws on any failure (not logged in,
+ * network error, non-2xx response) so callers can decide how to handle it.
+ * Returns the parsed JSON body on success. On a 401 it transparently tries
+ * one token refresh + retry before giving up.
+ */
+async function saveToBackend(entry, { isRetry = false } = {}) {
   const access = await getAccessToken();
   if (!access) {
-    throw new Error("No access token in storage — user is not logged in");
+    throw new Error("Not logged in — open the popup and sign in to sync applications");
   }
 
   // Don't send our locally-generated id: the backend model uses a UUID
   // primary key, and our "job_..." ids aren't valid UUIDs. Let Django
   // generate its own id; we map it back onto the local entry afterwards.
-  const { id, ...body } = entry;
+  const { id, synced, backendId, ...body } = entry;
 
   const response = await fetch(`${API_BASE}/applications/`, {
     method: "POST",
@@ -68,6 +182,11 @@ async function saveToBackend(entry) {
     },
     body: JSON.stringify(body),
   });
+
+  if (response.status === 401 && !isRetry) {
+    const newAccess = await refreshAccessToken();
+    if (newAccess) return saveToBackend(entry, { isRetry: true });
+  }
 
   if (!response.ok) {
     const text = await response.text().catch(() => "");
@@ -215,6 +334,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     case "RETRY_SYNC": {
       retryUnsyncedApplications().then((result) => sendResponse({ ok: true, ...result }));
+      return true;
+    }
+
+    case "GET_AUTH_STATE": {
+      getAuthState().then((state) => sendResponse(state));
+      return true;
+    }
+
+    case "LOGIN": {
+      login(message.email, message.password)
+        .then(({ email, fullName }) => sendResponse({ ok: true, email, fullName }))
+        .catch((err) => sendResponse({ ok: false, error: err.message }));
+      return true;
+    }
+
+    case "LOGOUT": {
+      logout().then(() => sendResponse({ ok: true }));
       return true;
     }
 

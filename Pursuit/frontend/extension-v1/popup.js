@@ -106,7 +106,24 @@ function openDashboard(e) {
   chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") });
 }
 
-async function init() {
+function showLoginScreen() {
+  document.getElementById("loginScreen").hidden = false;
+  document.getElementById("appContent").hidden = true;
+}
+
+function showAppContent(email, fullName) {
+  document.getElementById("loginScreen").hidden = true;
+  document.getElementById("appContent").hidden = false;
+  const row = document.getElementById("accountRow");
+  if (email || fullName) {
+    row.hidden = false;
+    document.getElementById("accountEmail").textContent = fullName || email;
+  } else {
+    row.hidden = true;
+  }
+}
+
+async function loadAppData() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   const { applications } = await chrome.runtime.sendMessage({ type: "GET_APPLICATIONS" });
@@ -120,7 +137,7 @@ async function init() {
   const alreadySaved = job ? applications.some((a) => a.url === job.url) : false;
   renderCapture(job, alreadySaved);
 
-  document.getElementById("saveBtn").addEventListener("click", async () => {
+  document.getElementById("saveBtn").onclick = async () => {
     if (!job) return;
     const btn = document.getElementById("saveBtn");
     const label = document.getElementById("saveBtnLabel");
@@ -133,11 +150,60 @@ async function init() {
       renderStats(fresh.applications);
       renderList(fresh.applications);
     }
+  };
+}
+
+function wireLoginForm() {
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const btn = document.getElementById("loginBtn");
+    const label = document.getElementById("loginBtnLabel");
+    const errorBox = document.getElementById("loginError");
+
+    errorBox.hidden = true;
+    btn.disabled = true;
+    label.textContent = "Signing in…";
+
+    const res = await chrome.runtime.sendMessage({ type: "LOGIN", email, password });
+
+    if (res?.ok) {
+      showAppContent(res.email, res.fullName);
+      await loadAppData();
+    } else {
+      errorBox.textContent = res?.error || "Sign in failed. Try again.";
+      errorBox.hidden = false;
+      btn.disabled = false;
+      label.textContent = "Sign in";
+    }
   });
+}
+
+function wireLogout() {
+  document.getElementById("logoutLink").addEventListener("click", async (e) => {
+    e.preventDefault();
+    await chrome.runtime.sendMessage({ type: "LOGOUT" });
+    showLoginScreen();
+  });
+}
+
+async function init() {
+  wireLoginForm();
+  wireLogout();
 
   document.getElementById("openDashboard").addEventListener("click", openDashboard);
   document.getElementById("viewAll").addEventListener("click", openDashboard);
   document.getElementById("openDashboardIcon").addEventListener("click", openDashboard);
+
+  const { loggedIn, email, fullName } = await chrome.runtime.sendMessage({ type: "GET_AUTH_STATE" });
+  if (!loggedIn) {
+    showLoginScreen();
+    return;
+  }
+
+  showAppContent(email, fullName);
+  await loadAppData();
 }
 
 init();
