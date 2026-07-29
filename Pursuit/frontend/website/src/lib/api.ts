@@ -177,53 +177,88 @@ export async function updateProfile(
 }
 
 /** Django target: POST /api/auth/change-password/ */
-export async function changePassword(
-  userId: string,
-  input: { currentPassword: string; newPassword: string }
-): Promise<void> {
-  await wait();
-  const users = readUsers();
-  const idx = users.findIndex((u) => u.id === userId);
-  if (idx === -1) throw new Error("User not found.");
-  if (users[idx].password !== input.currentPassword) {
-    throw new Error("Current password is incorrect.");
-  }
-  users[idx].password = input.newPassword;
-  writeUsers(users);
+export async function changePassword(input:{
+    currentPassword:string;
+    newPassword:string;
+    confirmPassword:string;
+}):Promise<void>{
+
+    const token = localStorage.getItem("access");
+
+    const res = await fetch(`${API_URL}/auth/change-password/`,{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json",
+            Authorization:`Bearer ${token}`,
+        },
+        body:JSON.stringify({
+            current_pass:input.currentPassword,
+            new_pass:input.newPassword,
+            re_enter_pass:input.confirmPassword,
+        }),
+    });
+
+    if(!res.ok){
+        const error=await res.json();
+        throw new Error(error.detail || "Password change failed");
+    }
 }
 
 /* ------------------------------------------------------------------
  * APPLICATIONS
  * Django target: GET /api/applications/
  * ------------------------------------------------------------------ */
-export async function getApplications(userId: string): Promise<JobApplication[]> {
-  await wait();
-  const existing = readApplications(userId);
-  if (existing.length) return existing;
-  // seed with demo data on first visit so the dashboard isn't empty
-  const { demoApplications } = await import("./mock-data");
-  writeApplications(userId, demoApplications);
-  return demoApplications;
+export async function getApplications(): Promise<JobApplication[]> {
+  const token = localStorage.getItem("access");
+
+  const res = await fetch(`${API_URL}/applications/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch applications");
+  }
+
+  return await res.json();
 }
 
 /** Django target: PATCH /api/applications/:id/ */
 export async function updateApplicationStatus(
-  userId: string,
   id: string,
   status: JobStatus
 ): Promise<void> {
-  await wait(150);
-  const apps = readApplications(userId);
-  const idx = apps.findIndex((a) => a.id === id);
-  if (idx !== -1) {
-    apps[idx].status = status;
-    writeApplications(userId, apps);
+  const token = localStorage.getItem("access");
+
+  const res = await fetch(`${API_URL}/applications/${id}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      status,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to update application");
   }
 }
 
 /** Django target: DELETE /api/applications/:id/ */
-export async function deleteApplication(userId: string, id: string): Promise<void> {
-  await wait(150);
-  const apps = readApplications(userId).filter((a) => a.id !== id);
-  writeApplications(userId, apps);
+export async function deleteApplication(id: string): Promise<void> {
+  const token = localStorage.getItem("access");
+
+  const res = await fetch(`${API_URL}/applications/${id}/`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete application");
+  }
 }
