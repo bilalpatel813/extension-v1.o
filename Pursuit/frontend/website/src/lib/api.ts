@@ -77,11 +77,7 @@ export async function registerUser(input: {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-     full_name: input.fullName,
-     email: input.email,
-     password: input.password,
-    })
+    body: JSON.stringify({input})
  });
  
   if (!res.ok) {
