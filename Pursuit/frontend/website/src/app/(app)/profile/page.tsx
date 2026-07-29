@@ -47,7 +47,7 @@ export default function ProfilePage() {
 
     setPasswordSaving(true);
     try {
-      await api.changePassword({ currentPassword, newPassword });
+      await api.changePassword({ currentPassword, newPassword,confirmPassword });
       setPasswordMessage("Password changed.");
       setCurrentPassword("");
       setNewPassword("");
