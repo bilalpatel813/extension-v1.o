@@ -110,15 +110,15 @@ export async function loginUser(input: {
         headers:{
             "Content-Type":"application/json",
         },
-        body:JSON.stringfy(input)        
+        body:JSON.stringify(input)        
        });
       if (!res.ok){
-           throw new Error("Invalid credential")
+           throw new Error("Invalid credential");
        }
       const data = await res.json();
       localStorage.setItem("access",data.access);
       localStorage.setItem("access",data.access);
-      return data.user      
+      return data.user;
 }
   
 /** Django target: POST /api/auth/logout/ (blacklists refresh token) */
