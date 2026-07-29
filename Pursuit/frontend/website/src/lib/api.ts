@@ -56,8 +56,8 @@ export async function registerUser(input: {
  });
  
   if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-throw new Error(error.non_field_errors?.[0] || error.detail || Object.values(error)[0]?.[0] || "Request failed");
+    const error: any = await res.json().catch(() => ({}));
+    throw new Error(error.non_field_errors?.[0] || error.detail || Object.values(error)[0]?.[0] || "Request failed");
   }
 
   const data = await res.json();
@@ -84,8 +84,8 @@ export async function loginUser(input: {
         },
         body:JSON.stringify(input)        
        });
-        if (!res.ok) {
-            const error = await res.json().catch(() => ({}));
+       if (!res.ok) {
+            const error: any = await res.json().catch(() => ({}));
 throw new Error(error.non_field_errors?.[0] || error.detail || Object.values(error)[0]?.[0] || "Request failed");
 
 }
