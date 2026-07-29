@@ -109,7 +109,7 @@ export async function loginUser(input: {
         method :"POST",
         headers:{
             "Content-Type":"application/json",
-        }
+        },
         body:JSON.stringfy(input)        
        });
       if (!res.ok){
