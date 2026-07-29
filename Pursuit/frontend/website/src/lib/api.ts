@@ -36,32 +36,7 @@ export interface User {
   email: string;
 }
 
-const DELAY = 350; // simulated network latency so loading states are visible
 
-function wait(ms = DELAY) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function readUsers(): Array<User & { password: string }> {
-  if (typeof window === "undefined") return [];
-  return JSON.parse(localStorage.getItem("pursuit_users") || "[]");
-}
-
-function writeUsers(users: Array<User & { password: string }>) {
-  localStorage.setItem("pursuit_users", JSON.stringify(users));
-}
-
-function readApplications(userId: string): JobApplication[] {
-  if (typeof window === "undefined") return [];
-  const all = JSON.parse(localStorage.getItem("pursuit_applications") || "{}");
-  return all[userId] || [];
-}
-
-function writeApplications(userId: string, apps: JobApplication[]) {
-  const all = JSON.parse(localStorage.getItem("pursuit_applications") || "{}");
-  all[userId] = apps;
-  localStorage.setItem("pursuit_applications", JSON.stringify(all));
-}
 
 /* ------------------------------------------------------------------
  * AUTH
@@ -77,12 +52,12 @@ export async function registerUser(input: {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({input})
+    body: JSON.stringify(input)
  });
  
   if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.detail || "Registration failed");
+    const error = await res.json().catch(() => ({}));
+throw new Error(error.non_field_errors?.[0] || error.detail || Object.values(error)[0]?.[0] || "Request failed");
   }
 
   const data = await res.json();
@@ -109,11 +84,13 @@ export async function loginUser(input: {
         },
         body:JSON.stringify(input)        
        });
-      if (!res.ok){
-           throw new Error("Invalid credential");
-       }
-      const data = await res.json();
-      localStorage.setItem("refresh",data.access);
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+throw new Error(error.non_field_errors?.[0] || error.detail || Object.values(error)[0]?.[0] || "Request failed");
+
+}
+const data = await res.json();
+      localStorage.setItem("refresh",data.refresh);
       localStorage.setItem("access",data.access);
       localStorage.setItem("pursuit_session", JSON.stringify(data.user));
       
@@ -123,19 +100,22 @@ export async function loginUser(input: {
 /** Django target: POST /api/auth/logout/ (blacklists refresh token) */
 export async function logoutUser(): Promise<void> {
   const refresh = localStorage.getItem("refresh");
-
-  await fetch(`${API_URL}/auth/logout/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("access")}`,
-    },
-    body: JSON.stringify({ refresh }),
-  });
-
-  localStorage.removeItem("access");
-  localStorage.removeItem("refresh");
-  localStorage.removeItem("pursuit_session");
+  try {
+    await fetch(`${API_URL}/auth/logout/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access")}`,
+      },
+      body: JSON.stringify({ refresh }),
+    });
+  } catch (err) {
+    console.error("Logout request failed, clearing local session anyway", err);
+  } finally {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("pursuit_session");
+  }
 }
 
 
@@ -161,19 +141,18 @@ export async function getCurrentUser():
 
 /** Django target: PATCH /api/profile/ */
 export async function updateProfile(
-  userId: string,
   updates: Partial<Pick<User, "fullName" | "email">>
 ): Promise<User> {
-  await wait();
-  const users = readUsers();
-  const idx = users.findIndex((u) => u.id === userId);
-  if (idx === -1) throw new Error("User not found.");
-  users[idx] = { ...users[idx], ...updates };
-  writeUsers(users);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password: _unusedPassword, ...safeUser } = users[idx];
-  localStorage.setItem("pursuit_session", JSON.stringify(safeUser));
-  return safeUser;
+  const token = localStorage.getItem("access");
+  const res = await fetch(`${API_URL}/profile/`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error("Failed to update profile");
+  const data = await res.json();
+  localStorage.setItem("pursuit_session", JSON.stringify(data));
+  return data;
 }
 
 /** Django target: POST /api/auth/change-password/ */
@@ -199,9 +178,11 @@ export async function changePassword(input:{
     });
 
     if(!res.ok){
-        const error=await res.json();
-        throw new Error(error.detail || "Password change failed");
+    const error=await res.json();  
+    throw new Error(error.detail || "Password change failed");
+    
     }
+ 
 }
 
 /* ------------------------------------------------------------------
