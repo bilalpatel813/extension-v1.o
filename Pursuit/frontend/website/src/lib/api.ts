@@ -98,25 +98,29 @@ export async function registerUser(input: {
 }
 
 /**
- * Django target: POST /api/auth/token/  ->  { access, refresh }
+ * Django target: POST /api/auth/login/  ->  { access, refresh }
  * followed by  GET /api/auth/me/  ->  { user }
  */
 export async function loginUser(input: {
   email: string;
   password: string;
 }): Promise<User> {
-  await wait();
-  const users = readUsers();
-  const match = users.find(
-    (u) => u.email.toLowerCase() === input.email.toLowerCase() && u.password === input.password
-  );
-  if (!match) throw new Error("Incorrect email or password.");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password: _unusedPassword, ...safeUser } = match;
-  localStorage.setItem("pursuit_session", JSON.stringify(safeUser));
-  return safeUser;
+    const res = await fetch(`${API_URL}/auth/login/`,{
+        method :"POST",
+        headers:{
+            "Content-Type":"application/json",
+        }
+        body:JSON.stringfy(input)        
+       });
+      if (!res.ok){
+           throw new Error("Invalid credential")
+       }
+      const data = await res.json();
+      localStorage.setItem("access",data.access);
+      localStorage.setItem("access",data.access);
+      return data.user      
 }
-
+  
 /** Django target: POST /api/auth/logout/ (blacklists refresh token) */
 export async function logoutUser(): Promise<void> {
   await wait(120);
