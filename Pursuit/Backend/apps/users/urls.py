@@ -11,6 +11,6 @@ urlpatterns = [
     path('login/', LoginAPI.as_view(), name='login'),
     path('logout/', LogOutAPI.as_view(), name='logout'),
     path('me/', Me.as_view(), name='me'),
-    path('change-pass/',ChangePassAPI.as_view(), name='change-pass'),
+    path('change-password/',ChangePassAPI.as_view(), name='change-password'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

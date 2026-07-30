@@ -73,14 +73,13 @@ class Me(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
         
-class ProfileAPI(ModelViewSet):
-   
-     serializer_class = UserSerializer
-     permission_classes= [IsAuthenticated]
-     def get_queryset(self):
-         return User.objects.filter( email =self.request.user)
-     def perform_create(self,serializer):
-            serializer.save(user=self.request.user)
+
+class ProfileAPI(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
            
 class ChangePassAPI(APIView):
     permission_classes = [IsAuthenticated]
