@@ -10,7 +10,7 @@ class User(AbstractUser):
     last_name = None
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    fullName = models.CharField(max_length=150)
+    full_Name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
     
     USERNAME_FIELD = "email"
