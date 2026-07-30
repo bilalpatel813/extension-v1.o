@@ -231,7 +231,11 @@ export async function getApplications(): Promise<JobApplication[]> {
     throw new Error("Failed to fetch applications");
   }
 
-  return await res.json();
+  const data = await res.json();
+  // The backend paginates with DRF's PageNumberPagination, so the real
+  // list lives under `results`. Falling back to `data` itself keeps this
+  // working if pagination is ever turned off for this view.
+  return Array.isArray(data) ? data : data.results ?? [];
 }
 
 /** Django target: PATCH /api/applications/:id/ */
