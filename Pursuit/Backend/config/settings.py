@@ -47,7 +47,10 @@ SECURE_HSTS_PRELOAD = True
  #   "chrome-extension://EXTENSION_ID",
 #]
 
-CORS_ALLOWED_ALL_ORIGINS = True
+#CORS_ALLOWED_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://pursuit-.*-patelbilal8137-5835s-projects\.vercel\.app$",
+]
 CORS_ALLOWED_ORIGINS = [
     "https://pursuit-sandy-three.vercel.app",
 ]
@@ -56,6 +59,7 @@ CORS_ALLOWED_ORIGINS = [
 INSTALLED_APPS = [
     'apps.Tracker.apps.TrackerConfig',
     'apps.Analytics.apps.AnalyticsConfig',
+    'django_extensions'
     'apps.users.apps.UsersConfig',
     'rest_framework',
     "corsheaders",
