@@ -21,7 +21,6 @@ class SignUpAPI(generics.CreateAPIView):
 
         refresh = RefreshToken.for_user(user)
         print(serializer.data)
-
         return Response({
         "user": serializer.data,
         "refresh": str(refresh),

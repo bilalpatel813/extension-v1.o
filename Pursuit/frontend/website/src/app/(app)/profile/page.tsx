@@ -13,6 +13,7 @@ export default function ProfilePage() {
   const [email, setEmail] = useState(user?.email ?? "");
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -25,9 +26,15 @@ export default function ProfilePage() {
     e.preventDefault();
     setProfileSaving(true);
     setProfileMessage(null);
-    await updateProfile({ fullName, email });
-    setProfileSaving(false);
-    setProfileMessage("Profile updated.");
+    setProfileError(null);
+    try {
+      await updateProfile({ fullName, email });
+      setProfileMessage("Profile updated.");
+    } catch (err) {
+      setProfileError(err instanceof Error ? err.message : "Failed to update profile.");
+    } finally {
+      setProfileSaving(false);
+    }
   }
 
   async function handlePasswordSubmit(e: React.FormEvent) {
@@ -116,6 +123,7 @@ export default function ProfilePage() {
               {profileSaving ? "Saving…" : "Save changes"}
             </button>
             {profileMessage && <span className="text-[12px] text-ok">{profileMessage}</span>}
+            {profileError && <span className="text-[12px] text-rejected">{profileError}</span>}
           </div>
         </form>
       </motion.section>

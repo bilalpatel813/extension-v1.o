@@ -39,7 +39,8 @@ node_modules/
 .next/
 out/
 build/
-
+frontend/website/CLAUDE.md
+frontend/website/AGENTS.md
 # Logs
 npm-debug.log*
 yarn-debug.log*

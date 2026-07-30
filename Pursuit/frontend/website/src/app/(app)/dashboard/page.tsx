@@ -36,15 +36,19 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [apps, setApps] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState<JobStatus | "all">("all");
 
   useEffect(() => {
     if (!user) return;
-    api.getApplications().then((data) => {
-      setApps(data);
-      setLoading(false);
-    });
+    setLoading(true);
+    setLoadError(null);
+    api
+      .getApplications()
+      .then((data) => setApps(data))
+      .catch((err) => setLoadError(err instanceof Error ? err.message : "Failed to load applications."))
+      .finally(() => setLoading(false));
   }, [user]);
 
   const filtered = useMemo(() => {
@@ -70,14 +74,26 @@ export default function DashboardPage() {
 
   async function handleStatusChange(id: string, status: JobStatus) {
     if (!user) return;
+    const previous = apps;
     setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
-    await api.updateApplicationStatus(id, status);
+    try {
+      await api.updateApplicationStatus(id, status);
+    } catch (err) {
+      setApps(previous);
+      setLoadError(err instanceof Error ? err.message : "Failed to update status.");
+    }
   }
 
   async function handleDelete(id: string) {
     if (!user) return;
+    const previous = apps;
     setApps((prev) => prev.filter((a) => a.id !== id));
-    await api.deleteApplication(id);
+    try {
+      await api.deleteApplication(id);
+    } catch (err) {
+      setApps(previous);
+      setLoadError(err instanceof Error ? err.message : "Failed to delete application.");
+    }
   }
 
   return (
@@ -137,6 +153,8 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+      {loadError && <p className="text-[12px] text-rejected mb-4">{loadError}</p>}
 
       <div className="rounded-2xl border border-line-soft bg-bg-card overflow-hidden">
         {loading ? (
