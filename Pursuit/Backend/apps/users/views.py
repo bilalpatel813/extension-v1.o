@@ -20,6 +20,7 @@ class SignUpAPI(generics.CreateAPIView):
         user = serializer.save()
 
         refresh = RefreshToken.for_user(user)
+        print(serializer.data)
 
         return Response({
         "user": serializer.data,
