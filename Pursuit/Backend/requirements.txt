@@ -9,3 +9,4 @@ dj_database_url
 gunicorn
 whitenoise
 djangorestframework-camel-case
+django-extensions pygraphviz
