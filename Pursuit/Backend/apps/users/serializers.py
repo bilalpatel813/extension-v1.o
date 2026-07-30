@@ -3,6 +3,7 @@ from .models import User
 from django.contrib.auth import authenticate
 # users serializer
 class RegisterSerializer(serializers.ModelSerializer):
+    fullName = serializers.CharField(source="full_name")
     
     class Meta:
         model = User
