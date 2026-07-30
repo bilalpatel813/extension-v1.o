@@ -3,11 +3,10 @@ from .models import User
 from django.contrib.auth import authenticate
 # users serializer
 class RegisterSerializer(serializers.ModelSerializer):
-    fullName = serializers.CharField(source="full_name")
     
     class Meta:
         model = User
-        fields = ['id','fullName','email','password']
+        fields = ['id','full_name','email','password']
     def create(self, validated_data):
             user = User.objects.create_user(**validated_data)
             return user
@@ -29,6 +28,7 @@ class LoginSerializer(serializers.Serializer):
         return data
          
 class UserSerializer(serializers.ModelSerializer):
+    fullName = serializers.CharField(source="full_name")
     class Meta:
         model = User
         fields = ['id','fullName','email']
