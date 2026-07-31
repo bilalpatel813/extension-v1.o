@@ -174,6 +174,14 @@ async function saveToBackend(entry, { isRetry = false } = {}) {
   // generate its own id; we map it back onto the local entry afterwards.
   const { id, synced, backendId, ...body } = entry;
 
+  // FIX (see chat): `entry.appliedAt` is a raw JS millisecond timestamp
+  // (from Date.now()), used as-is by the local popup/dashboard for
+  // sorting. Django's `applied_at` is a DateTimeField that only accepts
+  // ISO 8601 strings — sending the raw number made every sync fail a
+  // silent 400 validation error, so nothing ever reached the database.
+  // Convert only on the outgoing copy; the local `entry` stays a number.
+  body.appliedAt = new Date(entry.appliedAt).toISOString();
+
   const response = await fetch(`${API_BASE}/applications/`, {
     method: "POST",
     headers: {

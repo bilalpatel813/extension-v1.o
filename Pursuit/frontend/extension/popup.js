@@ -101,9 +101,16 @@ function renderCapture(job, alreadySaved) {
   }
 }
 
+// UPDATE THIS if the website ever moves to a different domain — it's the
+// only place the extension hardcodes the site's URL.
+const WEBSITE_URL = "https://pursuit-sandy-three.vercel.app";
+
 function openDashboard(e) {
   if (e) e.preventDefault();
-  chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") });
+  // Opens the real, backend-connected dashboard on the website (same
+  // account, synced data) rather than the extension's own bundled
+  // dashboard.html, which only ever showed this browser's local cache.
+  chrome.tabs.create({ url: `${WEBSITE_URL}/dashboard` });
 }
 
 function showLoginScreen() {
