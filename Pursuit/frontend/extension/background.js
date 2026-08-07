@@ -6,7 +6,7 @@
  */
 
 const API_BASE = "https://pursuit-dp8h.onrender.com/api";
-
+console.log(chrome.runtime.id);
 // In-memory map of tabId -> last detected job (cleared on tab close/nav).
 // Lives only as long as the service worker is alive; that's fine since the
 // popup re-requests it fresh every time it opens.
