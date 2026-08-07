@@ -50,9 +50,9 @@ SECURE_HSTS_PRELOAD = True
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://pursuit-.*-patelbilal8137-5835s-projects\.vercel\.app$",
 ]
-CORS_ALLOWED_ORIGINS = [
-    "https://pursuit-sandy-three.vercel.app",
-]
+#CORS_ALLOWED_ORIGINS = [
+ #   "https://pursuit-sandy-three.vercel.app",
+#]
 # Application definition
 
 INSTALLED_APPS = [
