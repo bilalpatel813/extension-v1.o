@@ -42,17 +42,17 @@ CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-#CORS_ALLOWED_ORIGINS = [
- #   "chrome-extension://EXTENSION_ID",
-#]
+CORS_ALLOWED_ORIGINS = [
+    "chrome-extension://mojiaodbbgfnbocgjdkefidkgacljmfi" 
+]
 
 #CORS_ALLOWED_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://pursuit-.*-patelbilal8137-5835s-projects\.vercel\.app$",
 ]
-#CORS_ALLOWED_ORIGINS = [
- #   "https://pursuit-sandy-three.vercel.app",
-#]
+CORS_ALLOWED_ORIGINS = [
+    "https://pursuit-sandy-three.vercel.app",
+]
 # Application definition
 
 INSTALLED_APPS = [
