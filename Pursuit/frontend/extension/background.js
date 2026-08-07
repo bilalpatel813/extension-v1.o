@@ -76,7 +76,7 @@ async function clearTokens() {
 async function login(email, password) {
   const response = await fetch(`${API_BASE}/auth/login/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
     body: JSON.stringify({ email, password }),
   });
 
