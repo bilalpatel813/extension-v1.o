@@ -42,12 +42,11 @@ CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-CORS_ALLOWED_ORIGINS = [
-    "chrome-extension://mojiaodbbgfnbocgjdkefidkgacljmfi" 
-]
+
 CSRF_TRUSTED_ORIGINS = [
     "chrome-extension://mojiaodbbgfnbocgjdkefidkgacljmfi",
     "https://pursuit-sandy-three.vercel.app",
+    "https://pursuit-dp8h.onrender.com/"
 ]
 
 #CORS_ALLOWED_ALL_ORIGINS = True
@@ -56,6 +55,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 ]
 CORS_ALLOWED_ORIGINS = [
     "https://pursuit-sandy-three.vercel.app",
+    "chrome-extension://mojiaodbbgfnbocgjdkefidkgacljmfi"
 ]
 # Application definition
 
